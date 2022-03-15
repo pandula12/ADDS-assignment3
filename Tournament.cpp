@@ -1,5 +1,7 @@
 #include "Tournament.h"
 #include "Referee.h"
+#include <iostream>
+using namespace std;
 
 Tournament::Tournament()
 {
@@ -8,33 +10,27 @@ Tournament::Tournament()
 Player *Tournament::run(std::array<Player *, 8> competitors)
 {
     Referee ref;
-    char outcome;
     // GROUP STAGE
     std::array<Player *, 4> semifinals; // array to keep track of players which move on to semis
     int n = 0;                          // int to keep track of semifinals array index
     for (int x = 0; x <= 6; x += 2)
     {
-        int play1_wins = 0, play2_wins = 0;
         for (int i = 0; i < 5; i++)
         {
-            outcome = ref.refGame(competitors[x], competitors[x + 1]);
-            if (outcome == 'W')
-            {
-                play1_wins++;
-            }
-            else if (outcome == 'L')
-            {
-                play2_wins++;
-            }
+            ref.refGame(competitors[x], competitors[x+1]);
         }
-        if (play1_wins > play2_wins || play1_wins == play2_wins)
+        if (competitors[x]->wins > competitors[x+1]->wins || competitors[x]->wins == competitors[x+1]->wins)
         {
             semifinals[n] = competitors[x];
+            competitors[x]->print();
         }
         else
         {
             semifinals[n] = competitors[x + 1];
+            competitors[x+1]->print();
         }
+        competitors[x]->wins = 0;
+        competitors[x+1]->wins = 0;
         n++;
     }
 
@@ -46,29 +42,22 @@ Player *Tournament::run(std::array<Player *, 8> competitors)
     n = 0;                      // int to keep track of finals array index
     for (int x = 0; x <= 2; x += 2)
     {
-        int play1_wins = 0, play2_wins = 0;
         for (int i = 0; i < 5; i++)
         {
-            outcome = ref.refGame(competitors[x], competitors[x + 1]);
-            if (outcome == 'W')
-            {
-                play1_wins++;
-            }
-            else if (outcome == 'L')
-            {
-                play2_wins++;
-            }
+            ref.refGame(semifinals[x], semifinals[x+1]);
         }
-        competitors[x]->count=0;
-        competitors[x+1]->count=0;
-        if (play1_wins > play2_wins || play1_wins == play2_wins)
+        if (semifinals[x]->wins > semifinals[x+1]->wins || semifinals[x]->wins == semifinals[x+1]->wins)
         {
-            finals[n] = competitors[x];
+            finals[n] = semifinals[x];
+            semifinals[x]->print();
         }
         else
         {
-            finals[n] = competitors[x + 1];
+            finals[n] = semifinals[x + 1];
+            semifinals[x+1]->print();
         }
+        semifinals[x]->wins = 0;
+        semifinals[x+1]->wins = 0;
         n++;
     }
 
@@ -76,26 +65,17 @@ Player *Tournament::run(std::array<Player *, 8> competitors)
     finals[0]->count = 0;
     finals[1]->count = 0;
     Player *Winner;
-    int play1_wins = 0, play2_wins = 0;
     for (int i = 0; i < 5; i++)
     {
-        outcome = ref.refGame(competitors[0], competitors[1]);
-        if (outcome == 'W')
-        {
-            play1_wins++;
-        }
-        else if (outcome == 'L')
-        {
-            play2_wins++;
-        }
+        ref.refGame(finals[0], finals[1]);
     }
-    if (play1_wins > play2_wins || play1_wins == play2_wins)
+    if (finals[0]->wins > finals[1]->wins || finals[0]->wins == finals[1]->wins)
     {
-        Winner = competitors[0];
+        Winner = finals[0];
     }
     else
     {
-        Winner = competitors[1];
+        Winner = finals[1];
     }
     return Winner;
 }

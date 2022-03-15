@@ -7,6 +7,7 @@ class Player {
     Player();
     virtual char makeMove() = 0;
     int count;
+    int wins;
     virtual void print() = 0;
 };
 
